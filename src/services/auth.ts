@@ -1,20 +1,21 @@
 import axios from "./axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import AuthData from "../utils/Index";
+import { AuthData } from "../utils/Index";
 import useSwal from "./swal";
 
 export default function useAuth() {
   const navigate = useNavigate();
   const { accepted, rejected, confirmed } = useSwal();
   const [user, setUser] = useState({
-    username: "",
+    name: "",
   });
 
   async function login(params: AuthData) {
     try {
-      const response = await axios.post("/api/auth/login", params);
-      const token = response.data.token;
+      const response = await axios.post("/api/v1/auth/login", params);
+      console.log(response.data);
+      const token = response.data.Body.token;
       setToken(token);
       accepted(response.data.message);
       console.log(response.data);
@@ -45,7 +46,7 @@ export default function useAuth() {
 
     if (response.isConfirmed) {
       try {
-        await axios.get("/api/auth/logout");
+        await axios.get("/api/v1/auth/logout");
         removeToken();
         navigate("/login");
         accepted("Berhasil Logout");
@@ -69,8 +70,7 @@ export default function useAuth() {
 
   async function getAuth() {
     const response = await axios.get("/api/user");
-    setUser(response.data.data);
-    console.log(response.data);
+    setUser(response.data);
   }
 
   return {
